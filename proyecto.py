@@ -99,24 +99,23 @@ elif nombre_busqueda:
 else:
     buscar_por_ubigeo()
     
-n = st.slider("n", 5,100, step=1)
-chart_data = pd.DataFrame(np.random.randn(n),columns=['data'])
-st.line_chart(chart_data)
-
-
 #GRAFICO DE BARRAS
+# a cada region le corresponde un número 1 Amazonas, 2 Ancash, ... etc
 #column=st.selectbox("Seleccione el departamento: ", df_ubigeos.columns)
-column=st.selectbox("Seleccione el departamento: ", df_ubigeos['departamento_inei'])
+column=st.selectbox("Seleccione el departamento: ", df_join_ubigeo_centros.columns)
+
+
 #Contar datos
 data_counts = df_ubigeos[column].value_counts()
 
 #Crea grafico de barras
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(10,6))
 ax.bar(data_counts.index, data_counts.values, color="blue", edgecolor="blue")
 ax.set_title(f"Grafico de barras de {column}")
 ax.set_xlabel(column)
 ax.set_ylabel("Frecuencia")
 
+ax.set_xticklabels(data_counts.index, rotation=45, ha="right")
 #Mostrar el grafico
 st.pyplot(fig)
 
