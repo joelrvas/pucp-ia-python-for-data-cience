@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 # Funciones útiles
 def cargar_datos(filename):
@@ -96,3 +98,33 @@ elif nombre_busqueda:
      buscar_por_centro_vacunacion()
 else:
     buscar_por_ubigeo()
+    
+n = st.slider("n", 5,100, step=1)
+chart_data = pd.DataFrame(np.random.randn(n),columns=['data'])
+st.line_chart(chart_data)
+
+
+#GRAFICO DE BARRAS
+#column=st.selectbox("Seleccione el departamento: ", df_ubigeos.columns)
+column=st.selectbox("Seleccione el departamento: ", df_ubigeos['departamento_inei'])
+#Contar datos
+data_counts = df_ubigeos[column].value_counts()
+
+#Crea grafico de barras
+fig, ax = plt.subplots()
+ax.bar(data_counts.index, data_counts.values, color="blue", edgecolor="blue")
+ax.set_title(f"Grafico de barras de {column}")
+ax.set_xlabel(column)
+ax.set_ylabel("Frecuencia")
+
+#Mostrar el grafico
+st.pyplot(fig)
+
+             
+
+
+
+
+    
+
+
