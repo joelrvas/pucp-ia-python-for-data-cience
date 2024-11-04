@@ -106,7 +106,8 @@ st.line_chart(chart_data)
 
 #GRAFICO DE BARRAS
 #column=st.selectbox("Seleccione el departamento: ", df_ubigeos.columns)
-column=st.selectbox("Seleccione el departamento: ", df_ubigeos['departamento_inei'])
+#column=st.selectbox("Seleccione el departamento: ", df_ubigeos['departamento_inei'])
+column=st.selectbox("Seleccione el departamento: ", df_join_ubigeo_centros.columns)
 #Contar datos
 data_counts = df_ubigeos[column].value_counts()
 
