@@ -15,10 +15,10 @@ def dashboard():
 
 # Crear un sidebar para la navegación
 st.sidebar.title("Navegación")
-selection = st.sidebar.radio("Ir a:", ["COVID 2019", "Centro de Vacunación"])
+selection = st.sidebar.radio("Ir a:", ["Dashboard COVID 2019", "Centro de Vacunación"])
 
 # Mostrar la página seleccionada
-if selection == "COVID 2019":
+if selection == "Dashboard COVID 2019":
     dashboard()
 elif selection == "Centro de Vacunación":
     buscar_centro_vacunacion_page()
@@ -26,16 +26,6 @@ elif selection == "Centro de Vacunación":
 # CSS personalizado para ocultar los elementos de navegación
 hide_streamlit_style = """
          <style>
-            [data-testid="stSidebar"][aria-expanded="true"] {
-                min-width: 0px;
-                max-width: 0px;
-                overflow: hidden;
-            }
-            [data-testid="stSidebar"][aria-expanded="true"] {
-                min-width: 250px;
-                max-width: 250px;
-                overflow: hidden;
-            }
             [data-testid="stSidebarNavItems"] {
                 display: none;
             }
