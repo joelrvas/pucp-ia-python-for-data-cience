@@ -111,7 +111,7 @@ data_counts = df_ubigeos[column].value_counts()
 #Crea grafico de barras
 fig, ax = plt.subplots(figsize=(10,6))
 ax.bar(data_counts.index, data_counts.values, color="blue", edgecolor="blue")
-ax.set_title(f"Grafico de barras de {column}")
+ax.set_title(f"Número de centros de vacunación por departamento {column}")
 ax.set_xlabel(column)
 ax.set_ylabel("Frecuencia")
 
