@@ -1,9 +1,33 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 
-# Funciones útiles
+def app():
+    st.title('Centros de Vacunación - COVID')
+    # Carga de datos
+    df_ubigeos = cargar_datos('data/TB_UBIGEOS.csv')
+    df_vacunacion = cargar_datos('data/TB_CENTRO_VACUNACION.csv')
+    departamentos, provincias, distritos = obtener_listas_unicas(df_ubigeos)
+    depto_sel, prov_sel, dist_sel = crear_combobox(df_ubigeos, departamentos, provincias, distritos)
+    nombre_busqueda = st.text_input('Buscar por centro de vacunación', key='nombre_busqueda')
+
+    # Botón Limpiar
+    crear_btn_limpiar()
+
+    # Unir los datos de vacunación y ubigeos
+    df_join_ubigeo_centros = pd.merge(df_vacunacion, df_ubigeos, how='left', left_on='id_ubigeo', right_on='id_ubigeo')
+    df_join_ubigeo_centros = df_join_ubigeo_centros[['departamento', 'provincia', 'distrito', 'id_ubigeo', 'id_centro_vacunacion', 'nombre', 'latitud_x', 'longitud_x', 'entidad_administra', 'id_eess']]
+
+    # Mostrar resultados según el tipo de búsqueda
+    if nombre_busqueda and depto_sel != 'Seleccione' and prov_sel != 'Seleccione' and dist_sel != 'Seleccione':
+        buscar_por_centro_vacunacion_and_ubigeo(df_ubigeos,df_join_ubigeo_centros,nombre_busqueda, depto_sel, prov_sel, dist_sel)
+    elif nombre_busqueda:
+        buscar_por_centro_vacunacion(df_join_ubigeo_centros,nombre_busqueda)
+    else:
+        buscar_por_ubigeo(df_ubigeos, df_join_ubigeo_centros, depto_sel, prov_sel, dist_sel)
+
+
+
+################################# Funciones #####################################
 def cargar_datos(filename):
     return pd.read_csv(filename, delimiter=';')
 
@@ -44,86 +68,33 @@ def obtener_id_ubigeo(df, depto_sel, prov_sel, dist_sel):
     else:
         return None
 
-def buscar_por_centro_vacunacion():
+def buscar_por_centro_vacunacion(df_join_ubigeo_centros,nombre_busqueda):
     resultado_busqueda = df_join_ubigeo_centros[df_join_ubigeo_centros['nombre'].str.contains(nombre_busqueda, case=False, na=False)]
+    result = resultado_busqueda[['departamento','provincia','distrito','nombre','entidad_administra','latitud_x','longitud_x']]
     st.write(f"Resultados de la búsqueda por nombre '{nombre_busqueda}':")
-    st.write(resultado_busqueda)
+    st.write(result)
 
-def buscar_por_ubigeo():
+def buscar_por_ubigeo(df_ubigeos,df_join_ubigeo_centros, depto_sel, prov_sel, dist_sel):
     # Filtrar por id_ubigeo seleccionado
     if depto_sel != 'Seleccione' and prov_sel != 'Seleccione' and dist_sel != 'Seleccione':
         id_ubigeo = obtener_id_ubigeo(df_ubigeos, depto_sel, prov_sel, dist_sel)
         if id_ubigeo:          
             resultado_centro_vacunacion = df_join_ubigeo_centros.loc[df_join_ubigeo_centros['id_ubigeo'] == id_ubigeo, ['departamento', 'provincia', 'distrito', 'id_ubigeo', 'nombre', 'id_centro_vacunacion', 'entidad_administra', 'latitud_x', 'longitud_x']]
-            st.write("Centro de vacunación correspondiente al ID de Ubigeo seleccionado:")           
-            st.write(resultado_centro_vacunacion)
+            st.write("Centro de vacunación correspondiente al ID de Ubigeo seleccionado:")
+            result = resultado_centro_vacunacion[['departamento','provincia','distrito','nombre','entidad_administra','latitud_x','longitud_x']]
+            st.write(result)
         else:
             st.write('No se encontró el ID de Ubigeo correspondiente a la selección.')
     else:
         st.write('Por favor, selecciona Departamento, Provincia y Distrito.')
 
-def buscar_por_centro_vacunacion_and_ubigeo():
+def buscar_por_centro_vacunacion_and_ubigeo(df_ubigeos,df_join_ubigeo_centros,nombre_busqueda, depto_sel, prov_sel, dist_sel):
     id_ubigeo = obtener_id_ubigeo(df_ubigeos, depto_sel, prov_sel, dist_sel)
     if id_ubigeo:          
        resultado_centro_vacunacion = df_join_ubigeo_centros.loc[df_join_ubigeo_centros['id_ubigeo'] == id_ubigeo, ['departamento', 'provincia', 'distrito', 'id_ubigeo', 'nombre', 'id_centro_vacunacion', 'entidad_administra', 'latitud_x', 'longitud_x']]
        resultado_busqueda = resultado_centro_vacunacion[resultado_centro_vacunacion['nombre'].str.contains(nombre_busqueda, case=False, na=False)]
+       result = resultado_busqueda[['departamento','provincia','distrito','nombre','entidad_administra','latitud_x','longitud_x']]
        st.write(f"Resultados de la búsqueda por nombre '{nombre_busqueda}' y Ubigeo seleccionado:")           
-       st.write(resultado_busqueda)
+       st.write(result)
     else:
        st.write('No se encontró resultados para los criterios de búsqueda')
-
-############## Inicio del script #########################
-
-# Título del proyecto
-st.title('Gobierno del Perú - Covid')
-
-# Carga de datos
-df_ubigeos = cargar_datos('TB_UBIGEOS.csv')
-df_vacunacion = cargar_datos('TB_CENTRO_VACUNACION.csv')
-departamentos, provincias, distritos = obtener_listas_unicas(df_ubigeos)
-depto_sel, prov_sel, dist_sel = crear_combobox(df_ubigeos, departamentos, provincias, distritos)
-nombre_busqueda = st.text_input('Buscar por centro de vacunación', key='nombre_busqueda')
-
-# Botón Limpiar
-crear_btn_limpiar()
-
-# Unir los datos de vacunación y ubigeos
-df_join_ubigeo_centros = pd.merge(df_vacunacion, df_ubigeos, how='left', left_on='id_ubigeo', right_on='id_ubigeo')
-df_join_ubigeo_centros = df_join_ubigeo_centros[['departamento', 'provincia', 'distrito', 'id_ubigeo', 'id_centro_vacunacion', 'nombre', 'latitud_x', 'longitud_x', 'entidad_administra', 'id_eess']]
-
-# Mostrar resultados según el tipo de búsqueda
-if nombre_busqueda and depto_sel != 'Seleccione' and prov_sel != 'Seleccione' and dist_sel != 'Seleccione':
-    buscar_por_centro_vacunacion_and_ubigeo()
-elif nombre_busqueda:
-     buscar_por_centro_vacunacion()
-else:
-    buscar_por_ubigeo()
-    
-#GRAFICO DE BARRAS
-# a cada region le corresponde un número 1 Amazonas, 2 Ancash, ... etc
-#column=st.selectbox("Seleccione el departamento: ", df_ubigeos.columns)
-column=st.selectbox("Seleccione el departamento: ", df_join_ubigeo_centros.columns)
-
-
-#Contar datos
-data_counts = df_ubigeos[column].value_counts()
-
-#Crea grafico de barras
-fig, ax = plt.subplots(figsize=(10,6))
-ax.bar(data_counts.index, data_counts.values, color="blue", edgecolor="blue")
-ax.set_title(f"Número de centros de vacunación por departamento {column}")
-ax.set_xlabel(column)
-ax.set_ylabel("Frecuencia")
-
-ax.set_xticklabels(data_counts.index, rotation=45, ha="right")
-#Mostrar el grafico
-st.pyplot(fig)
-
-             
-
-
-
-
-    
-
-
