@@ -13,3 +13,11 @@ def pag2():
 def pag3():
     registro()
     return 
+
+def pag4():
+    st.title("MAPA ANIMADO")
+    with open("static/grafico.html", "r") as file:
+        html_content = file.read()
+
+    st.components.v1.html(html_content, height=1000)
+    return 
