@@ -79,10 +79,16 @@ def buscar_por_ubigeo(df_ubigeos,df_join_ubigeo_centros, depto_sel, prov_sel, di
     if depto_sel != 'Seleccione' and prov_sel != 'Seleccione' and dist_sel != 'Seleccione':
         id_ubigeo = obtener_id_ubigeo(df_ubigeos, depto_sel, prov_sel, dist_sel)
         if id_ubigeo:          
-            resultado_centro_vacunacion = df_join_ubigeo_centros.loc[df_join_ubigeo_centros['id_ubigeo'] == id_ubigeo, ['departamento', 'provincia', 'distrito', 'id_ubigeo', 'nombre', 'id_centro_vacunacion', 'entidad_administra', 'latitud_x', 'longitud_x']]
+            resultado_centro_vacunacion = df_join_ubigeo_centros.loc[df_join_ubigeo_centros['id_ubigeo'] == id_ubigeo, ['departamento', 'provincia', 'distrito', 'id_ubigeo', 'nombre', 'id_centro_vacunacion', 'entidad_administra', 'latitud_x', 'longitud_x']]          
+            #enlace_html = f"https://www.google.com/maps?q={resultado_centro_vacunacion['latitud_x']},{resultado_centro_vacunacion['longitud_x']}"
+            resultado_centro_vacunacion['enlace'] = '<a href="https://www.google.com/maps?q='+resultado_centro_vacunacion['latitud_x'].astype(str) + ',' + resultado_centro_vacunacion['longitud_x'].astype(str)+'" target="_blank">Ver mapa</a>'
             st.write("Centro de vacunación correspondiente al ID de Ubigeo seleccionado:")
-            result = resultado_centro_vacunacion[['departamento','provincia','distrito','nombre','entidad_administra','latitud_x','longitud_x']]
-            st.write(result)
+            result = resultado_centro_vacunacion[['departamento','provincia','distrito','nombre','entidad_administra','latitud_x','longitud_x','enlace']]
+            html_table = result.to_html(escape=False, index=False)
+
+            # Mostrar la tabla en Streamlit usando st.markdown()
+            st.markdown(html_table, unsafe_allow_html=True)
+            #st.write(result)
         else:
             st.write('No se encontró el ID de Ubigeo correspondiente a la selección.')
     else:
