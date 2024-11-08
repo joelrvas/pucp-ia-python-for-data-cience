@@ -1,9 +1,11 @@
 import streamlit as st
 from .centro_vacunacion import app
 from .registros import registro
+from .graficoBarras import appGraficos
 
 def pag1():
     st.title("DASHBOARD")
+    appGraficos()      
     return 
 
 def pag2():
